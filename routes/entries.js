@@ -34,6 +34,7 @@ router.post('/', function(req, res, next) {
             value: Number(req.body.value),
             // name: req.body.name,
             details: req.body.details,
+            isPersonal: req.body.isPersonal,
             currency: req.body.currency,
         });
         return entry.save();

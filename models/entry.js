@@ -6,6 +6,7 @@ const entrySchema = mongoose.Schema({
     quantity: { type: Number, required: true },
     value: { type: Number, required: true },
     // name: { type: String, required: true },
+    isPersonal: { type: Boolean, required: true },
     details: { type: String, required: true },
     currency: { type: String, required: true },
 });

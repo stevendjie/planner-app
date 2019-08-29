@@ -23,7 +23,7 @@ router.post('/', function(req, res, next) {
       _id: new mongoose.Types.ObjectId(),
       username: req.body.username,
       displayCurrency: req.body.displayCurrency,
-      splitQuantity: Number(req.body.splitQuantity)    
+      rates: req.body.rates   
   });
   user
   .save()
@@ -58,6 +58,7 @@ router.get('/:userId', function(req, res, next) {
 
 router.patch("/:userId", (req, res, next) => {
     const _id = req.params.userId;
+    console.log(req.body);
     User.findByIdAndUpdate(_id, req.body, { new: true })
     .exec()
     .then(user => {
