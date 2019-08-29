@@ -15,7 +15,7 @@ class Group extends Component {
                     <div className="card-header bg-dark d-flex justify-content-between">
                         <div className="text-white">
                             <span>{this.state.name}</span>
-                            <a className="btn btn-sm"><i className="fa fa-plus"></i></a>
+                            <a className="btn btn-sm mr-3"><i className="fa fa-plus"></i></a>
                             <span className="text-white ml-3 mr-3">Showing In:</span>
                             <input type="text" class="form-control form-control-sm mr-3" style={{ width: '10%', display:"inline-block"}}/>
                             <span className="text-white ml-3 mr-3">Split Qty:</span>
@@ -50,6 +50,8 @@ class Group extends Component {
                                         <a className="btn btn-sm"><i class="fa fa-trash"></i></a>
                                     </td>
                                     <td>Otto</td>
+                                    <td>@mdo</td>
+                                    <td>@mdo</td>
                                     <td>@mdo</td>
                                     <td>@mdo</td>
                                     <td>@mdo</td>
