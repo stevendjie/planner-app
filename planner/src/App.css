@@ -1,5 +1,6 @@
-.App {
+.App{
   font-family: 'Mali', cursive;
+  font-size: 0.8rem;
 }
 
 .App-logo {
@@ -10,7 +11,11 @@
 
 .App nav {
   font-family: 'Pacifico', cursive;
+  font-size: 1.5rem;
+}
 
+.btn.btn-sm.btn-xsm {
+  padding: .25rem .1rem !important ;
 }
 
 .App-header {

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
+import Analytics from './components/Analytics/Analytics.js';
 import Group from './components/Group/Group.js';
 
 const USER_ID = "5d681b04724536aa4a7e03a6";
@@ -7,9 +8,13 @@ const USER_ID = "5d681b04724536aa4a7e03a6";
 class App extends Component {
   constructor(){
     super();
-    this.state = { groups: [], rates: null };
+    this.state = { groups: [], rates: null, displayCurrency: null };
 
     this.updateRates = this.updateRates.bind(this);
+    this.updateDisplayCurrency = this.updateDisplayCurrency.bind(this);
+    this.updateGroup = this.updateGroup.bind(this);
+    this.addGroup = this.addGroup.bind(this);
+    this.removeGroup = this.removeGroup.bind(this);
   }
 
   componentDidMount() {
@@ -36,10 +41,54 @@ class App extends Component {
     .then((res) => {
       const { user } = res;
       if (user) {
-        const { rates } = user;
-        this.setState({ rates });
+        const { rates, displayCurrency } = user;
+        this.setState({ rates, displayCurrency });
       }
     });
+  }
+
+  updateDisplayCurrency(e) {
+    const { value } = e.target;
+    this.setState({ displayCurrency: value });
+  }
+
+  updateGroup(groupId, newGroupObj) {
+    const { groups } = this.state;
+    groups.map((g) => {
+      if (g._id === groupId) {
+        Object.assign(g, newGroupObj);
+      }
+      return g;
+    });
+    this.setState({ groups });
+  }
+
+  addGroup() {
+    const { groups } = this.state;
+    fetch(`/groups`, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            name: "Group",
+            displayCurrency: this.state.displayCurrency.toLowerCase(),
+            splitQuantity: 1
+        })
+    }).then(res => res.json())
+    .then((json) => {
+      const { group } = json;
+      group.entries = [];
+      group.editMode = true;
+      groups.push(group);
+      this.setState({ groups });
+    })
+  }
+
+  removeGroup(_id) {
+    let { groups } = this.state;
+    groups = groups.filter(g => g._id !== _id);
+    this.setState({ groups });
   }
 
   updateRates() {
@@ -73,20 +122,32 @@ class App extends Component {
         </nav>
         <div className="container pt-3">
           <div className="d-flex justify-content-start">
-            <a className="btn btn-light" onClick={this.updateRates}>Reload Exchange Rates</a>
+            <p><a className="btn btn-light" onClick={this.updateRates}>Reload Exchange Rates</a>&nbsp;
+                (Powered by Madis Väin's <a target="_blank" href="https://github.com/exchangeratesapi/exchangeratesapi">Exchange Rate API</a>)</p>
           </div>
-        {this.state.groups.map(group =>
+          <Analytics
+            groups={this.state.groups}
+            displayCurrency={this.state.displayCurrency}
+            rates={this.state.rates}
+            userId={USER_ID}
+            updateDisplayCurrency={this.updateDisplayCurrency}
+          />
+        {this.state.rates && this.state.groups.map(group =>
           <Group 
             _id={group._id}
+            key={group._id}
             name={group.name}
+            editMode={group.editMode}
             displayCurrency={group.displayCurrency}
             splitQuantity={group.splitQuantity}
             rates={this.state.rates}
             entries={group.entries}
+            updateGroup={this.updateGroup}
+            removeGroup={this.removeGroup}
           />
         )}
           <div className="d-flex pt-3">
-            <a className="btn btn-light">+ Group</a>
+            <a className="btn btn-light" onClick={this.addGroup}>+ Group</a>
           </div>
         </div>
       </div>
