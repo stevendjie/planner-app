@@ -85,7 +85,7 @@ router.patch("/:entryId", (req, res, next) => {
   
 router.delete("/:entryId", (req, res, next) => {
     const _id = req.params.entryId;
-    Entry.remove({ _id })
+    Entry.deleteMany({ _id })
     .exec()
     .then(() => {
         res.status(200).json({ message: 'Entry removed' });

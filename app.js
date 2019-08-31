@@ -23,7 +23,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-mongoose.connect("mongodb+srv://stevendjie:" + process.env.MONGO_ATLAS_PW + "@cluster0-e7gtv.mongodb.net/test?retryWrites=true&w=majority", { useNewUrlParser: true });
+mongoose.connect("mongodb+srv://stevendjie:" + process.env.MONGO_ATLAS_PW + 
+  "@cluster0-e7gtv.mongodb.net/test?retryWrites=true&w=majority", 
+  { useNewUrlParser: true, useFindAndModify: false });
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

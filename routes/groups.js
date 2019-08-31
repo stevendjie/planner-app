@@ -73,7 +73,7 @@ router.patch("/:groupId", (req, res, next) => {
   
 router.delete("/:groupId", (req, res, next) => {
     const _id = req.params.groupId;
-    Group.remove({ _id })
+    Group.deleteMany({ _id })
     .exec()
     .then(() => {
         res.status(200).json({ message: 'Group removed' });

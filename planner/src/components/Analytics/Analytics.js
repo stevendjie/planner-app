@@ -44,9 +44,10 @@ class Analytics extends Component {
             let splitTotal = 0;
             entries.forEach((entry) => {
                 const converted = getConvertedValue(entry.value, entry.currency, displayCurrency, rates);
-                total += getTotal(converted, entry.quantity);
+                const entryTotal = getTotal(converted, entry.quantity);
+                total += entryTotal;
                 if (entry.isPersonal) {
-                    splitTotal += getSplit(total, splitQuantity);
+                    splitTotal += getSplit(entryTotal, splitQuantity);
                 }
             });
             personalChartData.push([name, splitTotal]);
@@ -57,7 +58,7 @@ class Analytics extends Component {
         const options = orderCurrencies(Object.keys(rates));
         return (
             <div className="Analytics">
-                <div className="jumbotron">
+                <div className="jumbotron pt-3 pb-3">
                     <div className="row">
                         <div className="col-sm d-flex justify-content-center">
                             <span className="mr-3">Showing In:&nbsp;</span>
@@ -81,7 +82,7 @@ class Analytics extends Component {
                         </div>
                     </div>
                     <div className="row">
-                        <div className="col-sm">
+                        <div className="col">
                             <Chart
                                 width={'100%'}
                                 height={'300px'}
@@ -96,7 +97,7 @@ class Analytics extends Component {
                             />
                             <p>Personal Total: {format(allSplitTotal)} {displayCurrency.toUpperCase()}</p>
                         </div>
-                        <div className="col-sm">
+                        <div className="col">
                             <Chart
                                 width={'100%'}
                                 height={'300px'}

@@ -31,7 +31,8 @@ class App extends Component {
         groups.map((g) => {
           g.entries = entries.filter(e => e.groupId === g._id);
           return g;
-        })
+        });
+        console.log(groups);
         this.setState({ groups });
     })
     .catch((err) => { throw err; });

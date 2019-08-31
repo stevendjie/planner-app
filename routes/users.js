@@ -76,7 +76,7 @@ router.patch("/:userId", (req, res, next) => {
   
 router.delete("/:userId", (req, res, next) => {
     const _id = req.params.userId;
-    User.remove({ _id })
+    User.deleteMany({ _id })
     .exec()
     .then(() => {
         res.status(200).json({ message: 'User removed' });
