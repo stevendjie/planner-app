@@ -27,16 +27,20 @@ router.post('/', function(req, res, next) {
                 message: "Group not found"
             });
         }
-        const entry = new Entry({
+        const e = {
             _id: new mongoose.Types.ObjectId(),
             groupId: req.body.groupId,
-            quantity: Number(req.body.quantity),
-            value: Number(req.body.value),
-            // name: req.body.name,
+            quantity: parseInt(req.body.quantity, 10),
+            value: parseFloat(req.body.value),
             details: req.body.details,
             isPersonal: req.body.isPersonal,
             currency: req.body.currency,
-        });
+        };
+        const splitQuantity = parseInt(req.body.splitQuantity, 10);
+        if (!isNaN(splitQuantity)) {
+            e.splitQuantity = splitQuantity
+        }
+        const entry = new Entry(e);
         return entry.save();
     })
     .then(entry => {

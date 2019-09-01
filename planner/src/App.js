@@ -79,7 +79,7 @@ class App extends Component {
         })
     }).then(res => res.json())
     .then((json) => {
-      const { group, message } = json;
+      const { group, message, error } = json;
       if (group) {
         group.entries = [];
         group.editMode = true;
@@ -87,7 +87,7 @@ class App extends Component {
         this.setState({ groups });
         NotificationManager.success(message, "Success!", 3000)
       } else {
-        NotificationManager.error(message, "Failed!", 3000);
+        NotificationManager.error(error.message, "Failed!", 3000);
       }
     })
     .catch((err) => { NotificationManager.error(err.message, "Failed!", 3000); });
@@ -114,13 +114,13 @@ class App extends Component {
     })
     .then(res => res.json())
     .then((res) => {
-      const { user, message } = res;
+      const { user, message, error } = res;
       if (user) {
         const { rates } = user;
         this.setState({ rates });
         NotificationManager.success(message, "Success!", 3000);
       } else {
-        NotificationManager.error(message, "Failed!", 3000);
+        NotificationManager.error(error.message, "Failed!", 3000);
       }
     })
     .catch(err => NotificationManager.error(err.message, "Failed!", 3000));
@@ -131,7 +131,7 @@ class App extends Component {
       <div className="App">
         <NotificationContainer />
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-          <a className="navbar-brand" href="/">&copy; S.D. &trade;</a>
+          <a className="navbar-brand" href="/">&copy; S.D.</a>
         </nav>
         <div className="container pt-3">
           <div className="d-flex justify-content-start">

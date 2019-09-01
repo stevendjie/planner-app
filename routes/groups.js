@@ -23,7 +23,7 @@ router.post('/', function(req, res, next) {
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
         displayCurrency: req.body.displayCurrency,
-        splitQuantity: Number(req.body.splitQuantity),
+        splitQuantity: parseInt(req.body.splitQuantity, 10),
     });
     group
     .save()

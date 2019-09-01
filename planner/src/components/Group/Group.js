@@ -45,7 +45,7 @@ class Group extends Component {
             body: JSON.stringify(entry)
         }).then(res => res.json())
         .then((json) => {
-            const { entry, message } = json;
+            const { entry, error, message } = json;
             if (entry) {
                 entry.editMode = true;
                 entries.push(entry);
@@ -53,7 +53,7 @@ class Group extends Component {
                 this.props.updateGroup(this.props._id, { entries });
                 NotificationManager.success(message, "Success!", 3000);
             } else {
-                NotificationManager.error(message, "Failed!", 3000);
+                NotificationManager.error(error.message, "Failed!", 3000);
             }
         })
         .catch(err => NotificationManager.error(err.message, "Failed!", 3000));
@@ -86,29 +86,32 @@ class Group extends Component {
     saveEntry(entryId) {
         const {  entries } = this.state;
         const idx = entries.findIndex(e => e._id === entryId);
-        let { quantity, value, details, isPersonal, currency } = entries[idx];
+        let { quantity, value, details, isPersonal, currency, splitQuantity } = entries[idx];
+        
+        const entryObj = {};
         const groupId = this.props._id;
-
+        if (splitQuantity) {
+            splitQuantity = floor(splitQuantity);
+            if (isNaN(splitQuantity) || splitQuantity < 1) {
+                NotificationManager.error("Invalid split quantity", "Failed!", 3000);
+                return;
+            }
+        }
         quantity = floor(quantity);
         value = parseFloat(value);
         details = details && details.trim();
         currency = currency.trim().toLowerCase();
         if (isNaN(quantity) || isNaN(value) || quantity < 1 || !details || !currency) {
+            NotificationManager.error("Invalid input", "Failed!", 3000);
             return;
         }
+        Object.assign(entryObj, { groupId, quantity, value, details, isPersonal, currency, splitQuantity });
         fetch(`/entries/${entryId}`, {
             method: "PATCH",
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                groupId,
-                quantity,
-                value,
-                details,
-                isPersonal,
-                currency
-            })
+            body: JSON.stringify(entryObj)
         }).then(res => res.json())
         .then((json) => {
             const { entry, message } = json;
@@ -149,13 +152,13 @@ class Group extends Component {
             })
         }).then(res => res.json())
         .then((json) => {
-            this.setState({ editMode: false });
-            const { group, message } = json;
+            const { group, message, error } = json;
             if (group) {
+                this.setState({ editMode: false });
                 this.props.updateGroup(_id, group);
                 NotificationManager.success(message, "Success!", 3000);
             } else {
-                NotificationManager.error(message, "Failed!", 3000);
+                NotificationManager.error(error.message, "Failed!", 3000);
             }
         });
     }
@@ -182,10 +185,14 @@ class Group extends Component {
         })
         .then(res => res.json())
         .then((json) => {
-            const { message } = json;
-            this.setState({ entries });
-            this.props.updateGroup(this.props._id, { entries });
-            NotificationManager.success(message, "Success!", 3000);
+            const { message, error } = json;
+            if (error) {
+                NotificationManager.error(error.message, "Failed!", 3000);
+            } else {
+                this.setState({ entries });
+                this.props.updateGroup(this.props._id, { entries });
+                NotificationManager.success(message, "Success!", 3000);
+            }
         })
         .catch(err => NotificationManager.error(err.message, "Failed", 3000));
     }
@@ -202,11 +209,12 @@ class Group extends Component {
         let personalTotal = 0;
         let convertedPersonalTotal = 0;
         entries.map((entry) => {
+            const splitQty = entry.splitQuantity || this.state.splitQuantity;
             entry.convertedValue = getConvertedValue(entry.value, entry.currency, this.state.displayCurrency, this.props.rates);
             entry.total = getTotal(entry.value, entry.quantity);
             entry.convertedTotal = getTotal(entry.convertedValue, entry.quantity);
-            entry.splitTotal = entry.isPersonal ? getSplit(entry.total, this.state.splitQuantity) : 0;
-            entry.convertedSplitTotal = entry.isPersonal ? getSplit(entry.convertedTotal, this.state.splitQuantity) : 0;
+            entry.splitTotal = entry.isPersonal ? getSplit(entry.total, splitQty) : 0;
+            entry.convertedSplitTotal = entry.isPersonal ? getSplit(entry.convertedTotal, splitQty) : 0;
 
             total += entry.total;
             convertedTotal += entry.convertedTotal;
@@ -234,7 +242,7 @@ class Group extends Component {
                                 }
                                 <a className="btn btn-sm" onClick={this.addEntry}><i className="fa fa-plus"></i></a>
                             </div>
-                            <div className="col pt-1">
+                            <div className="col my-auto">
                                 <span className="mr-1"><i className="fa fa-square text-primary"></i></span>
                                 <span className="mr-2">Showing In:</span>
                                 { this.state.editMode ?
@@ -253,8 +261,8 @@ class Group extends Component {
                                     (<span>{this.state.displayCurrency.toUpperCase()}</span>)
                                 }
                             </div>
-                            <div className="col pt-1">
-                                <span className="mr-2">Split Qty:</span>
+                            <div className="col my-auto">
+                                <span className="mr-2">Default Split Qty:</span>
                                 { this.state.editMode ?
                                     (<input 
                                         type="number" 
@@ -280,6 +288,7 @@ class Group extends Component {
                                     <th scope="col" style={{ width: '8%'}}>Actions</th>
                                     <th scope="col" style={{ width: '20%'}}>Details</th>
                                     <th scope="col" style={{ width: '2%'}}>P?</th>
+                                    <th scope="col" style={{ width: '10%'}}><i className="fa fa-divide"></i></th>
                                     <th scope="col" style={{ width: '10%'}}>Qty</th>
                                     <th scope="col" style={{ width: '10%'}}>Value</th>
                                     <th scope="col" style={{ width: '10%'}}>$</th>
@@ -302,6 +311,7 @@ class Group extends Component {
 
                                         <td>{entry.editMode ? (<input type="text" className="form-control p-1" value={entry.details} onChange={(e) => { this.onChangeEntryAttr(e, "details", entry._id); } }/>) : (entry.details)}</td>
                                         <td>{entry.editMode ? (<input type="checkbox" className="form-control" checked={entry.isPersonal} onChange={(e) => { this.onChangeEntryAttr(e, "isPersonal", entry._id, true); } }/>) : (entry.isPersonal && <i className="fa fa-check"></i>)}</td>
+                                        <td>{entry.editMode ? (<input type="number" className="form-control p-1" value={entry.splitQuantity} onChange={(e) => { this.onChangeEntryAttr(e, "splitQuantity", entry._id); }}/>) : (entry.splitQuantity)}</td>
                                         <td>{entry.editMode ? (<input type="number" className="form-control p-1" value={entry.quantity} onChange={(e) => { this.onChangeEntryAttr(e, "quantity", entry._id); } }/>) : (floor(entry.quantity))}</td>
                                         <td>{entry.editMode ? (<input type="number" className="form-control p-1" value={entry.value} onChange={(e) => { this.onChangeEntryAttr(e, "value", entry._id); } }/>) : (format(entry.value))}</td>
                                         <td>{entry.editMode ? (
@@ -330,6 +340,7 @@ class Group extends Component {
                                     <td></td>
                                     <td></td>
                                     <td>All</td>
+                                    <td></td>
                                     <td></td>
                                     <td></td>
                                     <td></td>

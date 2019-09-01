@@ -58,7 +58,7 @@ class Analytics extends Component {
                 const entryTotal = getTotal(converted, entry.quantity);
                 total += entryTotal;
                 if (entry.isPersonal) {
-                    splitTotal += getSplit(entryTotal, splitQuantity);
+                    splitTotal += getSplit(entryTotal, entry.splitQuantity || splitQuantity);
                 }
             });
             personalChartData.push([name, splitTotal]);

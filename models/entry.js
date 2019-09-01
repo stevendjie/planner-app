@@ -9,6 +9,7 @@ const entrySchema = mongoose.Schema({
     isPersonal: { type: Boolean, required: true },
     details: { type: String, required: true },
     currency: { type: String, required: true },
+    splitQuantity: { type: Number, required: false }
 });
 
 module.exports = mongoose.model("Entry", entrySchema);
