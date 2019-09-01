@@ -63,7 +63,7 @@ router.patch("/:userId", (req, res, next) => {
     .exec()
     .then(user => {
         res.status(200).json({
-            message: 'User updated',
+            message: 'User settings updated',
             user
         });
     })

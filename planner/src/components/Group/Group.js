@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import 'react-notifications/lib/notifications.css';
+import { NotificationManager } from 'react-notifications';
 import { getTotal, getConvertedValue, format, getSplit, orderCurrencies, floor } from "../../helpers.js";
 import "./Group.css";
 
@@ -22,6 +24,7 @@ class Group extends Component {
         this.removeGroup = this.removeGroup.bind(this);
         this.addEntry = this.addEntry.bind(this);
         this.saveEntry = this.saveEntry.bind(this);
+        this.removeEntry = this.removeEntry.bind(this);
     }
 
     addEntry() {
@@ -42,14 +45,18 @@ class Group extends Component {
             body: JSON.stringify(entry)
         }).then(res => res.json())
         .then((json) => {
-            const { entry } = json;
+            const { entry, message } = json;
             if (entry) {
                 entry.editMode = true;
                 entries.push(entry);
                 this.setState({ entries });
                 this.props.updateGroup(this.props._id, { entries });
+                NotificationManager.success(message, "Success!", 3000);
+            } else {
+                NotificationManager.error(message, "Failed!", 3000);
             }
-        });
+        })
+        .catch(err => NotificationManager.error(err.message, "Failed!", 3000));
     }
 
     toggleEntryEditMode(entryId) {
@@ -104,12 +111,18 @@ class Group extends Component {
             })
         }).then(res => res.json())
         .then((json) => {
-            const { entry } = json;
-            entry.editMode = false;
-            entries[idx] = entry;
-            this.setState({ entries });
-            this.props.updateGroup(this.props._id, { entries });
-        });
+            const { entry, message } = json;
+            if (entry) {
+                entry.editMode = false;
+                entries[idx] = entry;
+                this.setState({ entries });
+                this.props.updateGroup(this.props._id, { entries });
+                NotificationManager.success(message, "Success!", 3000);
+            } else {
+                NotificationManager.error(message, "Failed!", 3000);
+            }
+        })
+        .catch(err => NotificationManager.error(err.message, "Failed!", 3000));
     }
 
     saveGroup(e) {
@@ -137,8 +150,13 @@ class Group extends Component {
         }).then(res => res.json())
         .then((json) => {
             this.setState({ editMode: false });
-            const { group } = json;
-            this.props.updateGroup(_id, group);
+            const { group, message } = json;
+            if (group) {
+                this.props.updateGroup(_id, group);
+                NotificationManager.success(message, "Success!", 3000);
+            } else {
+                NotificationManager.error(message, "Failed!", 3000);
+            }
         });
     }
 
@@ -147,11 +165,29 @@ class Group extends Component {
         fetch(`/groups/${_id}`, {
             method: "DELETE"
         })
+        .then(res => res.json())
         .then(() => Promise.all(this.state.entries.map(e =>
             fetch(`/entries/${e._id}`, { method: "DELETE" }))))
         .then(() => {
             this.props.removeGroup(_id);
-        });
+            NotificationManager.success("Group removed", "Success!", 3000);
+        })
+        .catch(err => NotificationManager.error(err.message, "Failed!", 3000));
+    }
+
+    removeEntry(entryId) {
+        const entries = this.state.entries.filter(e => e._id !== entryId);
+        fetch(`/entries/${entryId}`, {
+            method: "DELETE"
+        })
+        .then(res => res.json())
+        .then((json) => {
+            const { message } = json;
+            this.setState({ entries });
+            this.props.updateGroup(this.props._id, { entries });
+            NotificationManager.success(message, "Success!", 3000);
+        })
+        .catch(err => NotificationManager.error(err.message, "Failed", 3000));
     }
 
     toggleEditMode() {
@@ -160,6 +196,25 @@ class Group extends Component {
     
     render() {
         const options = orderCurrencies(Object.keys(this.props.rates));
+        const { entries } = this.state;
+        let total = 0;
+        let convertedTotal = 0;
+        let personalTotal = 0;
+        let convertedPersonalTotal = 0;
+        entries.map((entry) => {
+            entry.convertedValue = getConvertedValue(entry.value, entry.currency, this.state.displayCurrency, this.props.rates);
+            entry.total = getTotal(entry.value, entry.quantity);
+            entry.convertedTotal = getTotal(entry.convertedValue, entry.quantity);
+            entry.splitTotal = entry.isPersonal ? getSplit(entry.total, this.state.splitQuantity) : 0;
+            entry.convertedSplitTotal = entry.isPersonal ? getSplit(entry.convertedTotal, this.state.splitQuantity) : 0;
+
+            total += entry.total;
+            convertedTotal += entry.convertedTotal;
+            personalTotal += entry.splitTotal;
+            convertedPersonalTotal += entry.convertedSplitTotal;
+
+            return entry;
+        });
         return (
           <div className="Group">
             <div className="pt-3">
@@ -242,7 +297,7 @@ class Group extends Component {
                                         <td>
                                             <a className="btn btn-sm btn-xsm" onClick={() => { this.saveEntry(entry._id); } }><i className="fa fa-save"></i></a>
                                             <a className="btn btn-sm btn-xsm" onClick={(e) => { this.toggleEntryEditMode(entry._id); }}><i className="fa fa-edit"></i></a>
-                                            <a className="btn btn-sm btn-xsm"><i className="fa fa-trash"></i></a>
+                                            <a className="btn btn-sm btn-xsm" onClick={(e) => { this.removeEntry(entry._id); }}><i className="fa fa-trash"></i></a>
                                         </td>
 
                                         <td>{entry.editMode ? (<input type="text" className="form-control p-1" value={entry.details} onChange={(e) => { this.onChangeEntryAttr(e, "details", entry._id); } }/>) : (entry.details)}</td>
@@ -263,16 +318,28 @@ class Group extends Component {
                                             </select>) : (entry.currency.toUpperCase())}
                                         </td>
                                         
-                                        <td>{format(getConvertedValue(entry.value, entry.currency, this.state.displayCurrency, this.props.rates))}</td>
-                                        <td>{format(getTotal(entry.value, entry.quantity))}</td>
-                                        <td>{format(getTotal(getConvertedValue(entry.value, entry.currency, this.state.displayCurrency, this.props.rates),
-                                            entry.quantity))}</td>
-                                        <td>{!entry.isPersonal ? format(0) : format(getSplit(getTotal(entry.value, entry.quantity), this.state.splitQuantity))}</td>
-                                        <td>{!entry.isPersonal ? format(0) : format(getSplit(getTotal(getConvertedValue(entry.value, entry.currency, this.state.displayCurrency, this.props.rates),
-                                            entry.quantity), this.state.splitQuantity))}</td>
+                                        <td>{format(entry.convertedValue)}</td>
+                                        <td>{format(entry.total)}</td>
+                                        <td>{format(entry.convertedTotal)}</td>
+                                        <td>{format(entry.splitTotal)}</td>
+                                        <td>{format(entry.convertedSplitTotal)}</td>
                                     </tr>
                                   )
                                 }
+                                <tr className="bg-secondary text-white">
+                                    <td></td>
+                                    <td></td>
+                                    <td>All</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>{format(total)}</td>
+                                    <td>{format(convertedTotal)}</td>
+                                    <td>{format(personalTotal)}</td>
+                                    <td>{format(convertedPersonalTotal)}</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>

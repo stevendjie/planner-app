@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import 'react-notifications/lib/notifications.css';
+import { NotificationContainer, NotificationManager } from 'react-notifications';
 import './App.css';
 import Analytics from './components/Analytics/Analytics.js';
 import Group from './components/Group/Group.js';
@@ -32,7 +34,6 @@ class App extends Component {
           g.entries = entries.filter(e => e.groupId === g._id);
           return g;
         });
-        console.log(groups);
         this.setState({ groups });
     })
     .catch((err) => { throw err; });
@@ -78,12 +79,18 @@ class App extends Component {
         })
     }).then(res => res.json())
     .then((json) => {
-      const { group } = json;
-      group.entries = [];
-      group.editMode = true;
-      groups.push(group);
-      this.setState({ groups });
+      const { group, message } = json;
+      if (group) {
+        group.entries = [];
+        group.editMode = true;
+        groups.push(group);
+        this.setState({ groups });
+        NotificationManager.success(message, "Success!", 3000)
+      } else {
+        NotificationManager.error(message, "Failed!", 3000);
+      }
     })
+    .catch((err) => { NotificationManager.error(err.message, "Failed!", 3000); });
   }
 
   removeGroup(_id) {
@@ -107,24 +114,29 @@ class App extends Component {
     })
     .then(res => res.json())
     .then((res) => {
-      const { user } = res;
+      const { user, message } = res;
       if (user) {
         const { rates } = user;
         this.setState({ rates });
+        NotificationManager.success(message, "Success!", 3000);
+      } else {
+        NotificationManager.error(message, "Failed!", 3000);
       }
     })
+    .catch(err => NotificationManager.error(err.message, "Failed!", 3000));
   }
 
   render() {
     return (
       <div className="App">
+        <NotificationContainer />
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-          <a className="navbar-brand" href="/">&copy; S.D.</a>
+          <a className="navbar-brand" href="/">&copy; S.D. &trade;</a>
         </nav>
         <div className="container pt-3">
           <div className="d-flex justify-content-start">
             <p><a className="btn btn-light" onClick={this.updateRates}>Reload Exchange Rates</a>&nbsp;
-                (Powered by Madis Väin's <a target="_blank" href="https://github.com/exchangeratesapi/exchangeratesapi">Exchange Rate API</a>)</p>
+                (Powered by Madis Väin's ECB-based<a target="_blank" href="https://github.com/exchangeratesapi/exchangeratesapi">&nbsp;Exchange Rate API</a>)</p>
           </div>
           <Analytics
             groups={this.state.groups}
@@ -147,7 +159,7 @@ class App extends Component {
             removeGroup={this.removeGroup}
           />
         )}
-          <div className="d-flex pt-3">
+          <div className="d-flex pt-3 pb-3">
             <a className="btn btn-light" onClick={this.addGroup}>+ Group</a>
           </div>
         </div>

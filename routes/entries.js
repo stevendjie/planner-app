@@ -41,7 +41,7 @@ router.post('/', function(req, res, next) {
     })
     .then(entry => {
         res.status(201).json({
-            message: "Entry successfully saved",
+            message: "Entry successfully created",
             entry 
         });
     })
@@ -72,7 +72,7 @@ router.patch("/:entryId", (req, res, next) => {
     .exec()
     .then(entry => {
         res.status(200).json({
-            message: 'Entry updated',
+            message: 'Entry successfully updated',
             entry
         });
     })
@@ -88,7 +88,7 @@ router.delete("/:entryId", (req, res, next) => {
     Entry.deleteMany({ _id })
     .exec()
     .then(() => {
-        res.status(200).json({ message: 'Entry removed' });
+        res.status(200).json({ message: 'Entry successfully removed' });
     })
     .catch(error => {
         res.status(500).json({ error });

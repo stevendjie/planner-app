@@ -29,7 +29,7 @@ router.post('/', function(req, res, next) {
     .save()
     .then(group => {
       res.status(201).json({
-        message: "Group successfully saved",
+        message: "Group successfully created",
         group 
       });
     })
@@ -62,7 +62,7 @@ router.patch("/:groupId", (req, res, next) => {
     .exec()
     .then(group => {
         res.status(200).json({
-            message: 'Group updated',
+            message: 'Group successfully updated',
             group
         });
     })
@@ -76,7 +76,7 @@ router.delete("/:groupId", (req, res, next) => {
     Group.deleteMany({ _id })
     .exec()
     .then(() => {
-        res.status(200).json({ message: 'Group removed' });
+        res.status(200).json({ message: 'Group successfully removed' });
     })
     .catch(error => {
         res.status(500).json({ error });

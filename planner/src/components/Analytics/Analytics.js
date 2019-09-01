@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { Chart } from "react-google-charts";
+import 'react-notifications/lib/notifications.css';
+import { NotificationManager } from 'react-notifications';
 import { getTotal, getConvertedValue, getSplit, format, orderCurrencies } from "../../helpers.js";
 import "./Analytics.css";
 
@@ -20,9 +22,18 @@ class Analytics extends Component {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({ displayCurrency: displayCurrency.toLowerCase() })
-        }).then(() => {
-            this.setState({ editMode: false });
-        });
+        })
+        .then(res => res.json())
+        .then((json) => {
+            const { message, user } = json;
+            if (user) {
+                this.setState({ editMode: false });
+                NotificationManager.success(message, "Success!", 3000);
+            } else {
+                NotificationManager.error(message, "Failed!", 3000);
+            }
+        })
+        .catch(err => NotificationManager.error(err.message, "Failed!", 3000));
     }
 
     toggleEditMode() {
