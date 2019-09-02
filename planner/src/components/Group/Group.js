@@ -229,7 +229,7 @@ class Group extends Component {
                 <div className="card">
                     <div className="card-header bg-dark pt-1 pb-1">
                         <div className="row text-white">
-                            <div className="col">
+                            <div className="col my-auto">
                                 { this.state.editMode ? 
                                     (<input 
                                         type="text" 

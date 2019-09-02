@@ -5,6 +5,7 @@ const groupSchema = mongoose.Schema({
 	name: { type: String, required: true },
 	displayCurrency: { type: String, required: true },
 	splitQuantity: { type: Number, required: true },
+	ownedBy: { type: mongoose.Schema.Types.ObjectId, required: true }
 });
 
 module.exports = mongoose.model("Group", groupSchema);

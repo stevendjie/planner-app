@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const Group = require('../models/group');
+const User = require('../models/user');
 
 router.get('/', function(req, res, next) {
     Group.find()
@@ -19,14 +20,23 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/', function(req, res, next) {
-    const group = new Group({
-        _id: new mongoose.Types.ObjectId(),
-        name: req.body.name,
-        displayCurrency: req.body.displayCurrency,
-        splitQuantity: parseInt(req.body.splitQuantity, 10),
-    });
-    group
-    .save()
+    const ownedBy = req.body.ownedBy;
+    User.findById(ownedBy)
+    .then(user => {
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+        const group = new Group({
+            _id: new mongoose.Types.ObjectId(),
+            name: req.body.name,
+            displayCurrency: req.body.displayCurrency,
+            splitQuantity: parseInt(req.body.splitQuantity, 10),
+            ownedBy
+        });
+        return group.save();
+    })
     .then(group => {
       res.status(201).json({
         message: "Group successfully created",
