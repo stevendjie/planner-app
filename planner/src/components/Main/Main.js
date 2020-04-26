@@ -131,8 +131,8 @@ class Main extends Component {
       <div className="Main">
         <div className="container pt-3">
           <div className="d-flex justify-content-start">
-            <p><a className="btn btn-light" onClick={this.updateRates}>Reload Exchange Rates</a>&nbsp;
-                (Powered by Madis Väin's ECB-based<a target="_blank" href="https://github.com/exchangeratesapi/exchangeratesapi">&nbsp;Exchange Rate API</a>)</p>
+            <p><button className="btn btn-light" onClick={this.updateRates}>Reload Exchange Rates</button>&nbsp;
+                (Powered by Madis Väin's ECB-based<a target="_blank" rel="noopener noreferrer" href="https://github.com/exchangeratesapi/exchangeratesapi">&nbsp;Exchange Rate API</a>)</p>
           </div>
           <Analytics
             groups={this.state.groups}
@@ -156,7 +156,7 @@ class Main extends Component {
           />
         )}
           <div className="d-flex pt-3 pb-3">
-            <a className="btn btn-light" onClick={this.addGroup}>+ Group</a>
+            <button className="btn btn-light" onClick={this.addGroup}>+ Group</button>
           </div>
         </div>
       </div>

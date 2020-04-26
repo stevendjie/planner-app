@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { NotificationManager } from 'react-notifications';
 
 class Login extends Component {
     constructor(props) {
@@ -31,7 +30,7 @@ class Login extends Component {
                         <label>Password</label>
                         <input type="password" className="form-control" onChange={(e) => { this.onChangeField(e, "password"); }}/>
                     </div>
-                    <a className="btn btn-primary text-white" onClick={this.onLogin}>Login</a>
+                    <button className="btn btn-primary text-white" onClick={this.onLogin}>Login</button>
                 </div>
             </div>
         );

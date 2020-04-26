@@ -43,7 +43,8 @@ class Group extends Component {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify(entry)
-        }).then(res => res.json())
+        })
+        .then(res => res.json())
         .then((json) => {
             const { entry, error, message } = json;
             if (entry) {
@@ -204,9 +205,7 @@ class Group extends Component {
     render() {
         const options = orderCurrencies(Object.keys(this.props.rates));
         const { entries } = this.state;
-        let total = 0;
         let convertedTotal = 0;
-        let personalTotal = 0;
         let convertedPersonalTotal = 0;
         entries.map((entry) => {
             const splitQty = entry.splitQuantity || this.state.splitQuantity;
@@ -216,9 +215,7 @@ class Group extends Component {
             entry.splitTotal = entry.isPersonal ? getSplit(entry.total, splitQty) : 0;
             entry.convertedSplitTotal = entry.isPersonal ? getSplit(entry.convertedTotal, splitQty) : 0;
 
-            total += entry.total;
             convertedTotal += entry.convertedTotal;
-            personalTotal += entry.splitTotal;
             convertedPersonalTotal += entry.convertedSplitTotal;
 
             return entry;
@@ -240,7 +237,7 @@ class Group extends Component {
                                         />) :
                                     (<span className="font-weight-bold">{this.state.name}</span>)
                                 }
-                                <a className="btn btn-sm" onClick={this.addEntry}><i className="fa fa-plus"></i></a>
+                                <button className="btn btn-sm btn-dark" onClick={this.addEntry}><i className="fa fa-plus"></i></button>
                             </div>
                             <div className="col my-auto">
                                 <span className="mr-1"><i className="fa fa-square text-primary"></i></span>
@@ -274,14 +271,14 @@ class Group extends Component {
                                 }
                             </div>
                             <div className="col">
-                                <a className="btn btn-sm btn-xsm"><i className="fa fa-save" onClick={this.saveGroup}></i></a>
-                                <a className="btn btn-sm btn-xsm" onClick={this.toggleEditMode}><i className="fa fa-edit"></i></a>
-                                <a className="btn btn-sm btn-xsm"><i className="fa fa-trash" onClick={this.removeGroup}></i></a>
+                                <button className="btn btn-sm btn-xsm btn-dark"><i className="fa fa-save" onClick={this.saveGroup}></i></button>
+                                <button className="btn btn-sm btn-xsm btn-dark" onClick={this.toggleEditMode}><i className="fa fa-edit"></i></button>
+                                <button className="btn btn-sm btn-xsm btn-dark"><i className="fa fa-trash" onClick={this.removeGroup}></i></button>
                             </div>
                         </div>
                     </div>
                     <div className="card-body">
-                        <table className="table table-striped">
+                        <table className="table">
                             <thead className="thead-light">
                                 <tr>
                                     <th scope="col" style={{ width: '2%'}}>#</th>
@@ -304,9 +301,9 @@ class Group extends Component {
                                     <tr key={entry._id}>
                                         <td>{idx + 1}</td>
                                         <td>
-                                            <a className="btn btn-sm btn-xsm" onClick={() => { this.saveEntry(entry._id); } }><i className="fa fa-save"></i></a>
-                                            <a className="btn btn-sm btn-xsm" onClick={(e) => { this.toggleEntryEditMode(entry._id); }}><i className="fa fa-edit"></i></a>
-                                            <a className="btn btn-sm btn-xsm" onClick={(e) => { this.removeEntry(entry._id); }}><i className="fa fa-trash"></i></a>
+                                            <button className="btn btn-sm btn-xsm" onClick={() => { this.saveEntry(entry._id); } }><i className="fa fa-save"></i></button>
+                                            <button className="btn btn-sm btn-xsm" onClick={() => { this.toggleEntryEditMode(entry._id); }}><i className="fa fa-edit"></i></button>
+                                            <button className="btn btn-sm btn-xsm" onClick={() => { this.removeEntry(entry._id); }}><i className="fa fa-trash"></i></button>
                                         </td>
 
                                         <td>{entry.editMode ? (<input type="text" className="form-control p-1" value={entry.details} onChange={(e) => { this.onChangeEntryAttr(e, "details", entry._id); } }/>) : (entry.details)}</td>
@@ -346,9 +343,9 @@ class Group extends Component {
                                     <td></td>
                                     <td></td>
                                     <td></td>
-                                    <td>{format(total)}</td>
+                                    <td></td>
                                     <td>{format(convertedTotal)}</td>
-                                    <td>{format(personalTotal)}</td>
+                                    <td></td>
                                     <td>{format(convertedPersonalTotal)}</td>
                                 </tr>
                             </tbody>

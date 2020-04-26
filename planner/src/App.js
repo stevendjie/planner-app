@@ -38,7 +38,7 @@ class App extends Component {
                 <NotificationContainer />
                 <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
                     <a className="navbar-brand" href="/">&copy; S.D.</a>
-                    <a className="btn btn-sm nav-link text-white" onClick={() => { this.setState({ userId: null }); }}>{ this.state.userId && ("Sign Out")}</a>
+                    <button className="btn btn-sm btn-dark nav-link text-white" onClick={() => { this.setState({ userId: null }); }}>{ this.state.userId && ("Sign Out")}</button>
                 </nav>
                 { this.state.userId ?
                 (<Main 

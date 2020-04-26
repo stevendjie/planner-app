@@ -88,8 +88,8 @@ class Analytics extends Component {
                                 </select>) :
                                 (<span className="mr-3">{displayCurrency.toUpperCase()}</span>)
                             }
-                            <a className="btn btn-sm btn-xsm" onClick={this.saveDisplayCurrency}><i className="fa fa-save"></i></a>
-                            <a className="btn btn-sm btn-xsm" onClick={this.toggleEditMode}><i className="fa fa-edit"></i></a>
+                            <button className="btn btn-sm btn-xsm btn-light" onClick={this.saveDisplayCurrency}><i className="fa fa-save"></i></button>
+                            <button className="btn btn-sm btn-xsm btn-light" onClick={this.toggleEditMode}><i className="fa fa-edit"></i></button>
                         </div>
                     </div>
                     <div className="row">
