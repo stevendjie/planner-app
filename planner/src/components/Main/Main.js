@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { NotificationManager } from 'react-notifications';
-import './Main.css';
 import Analytics from '../Analytics/Analytics.js';
 import Group from '../Group/Group.js';
 

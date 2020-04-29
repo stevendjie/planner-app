@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import 'react-notifications/lib/notifications.css';
 import { NotificationManager } from 'react-notifications';
 import { getTotal, getConvertedValue, format, getSplit, orderCurrencies, floor } from "../../helpers.js";
-import "./Group.css";
 
 class Group extends Component {
     constructor(props){
@@ -231,13 +230,13 @@ class Group extends Component {
                                     (<input 
                                         type="text" 
                                         className="form-control form-control-sm" 
-                                        style={{ width:'70%', display:"inline-block"}} 
+                                        style={{ width:'70%', display:"inline-block" }} 
                                         onChange={(e) => { this.onChangeGroupAttr(e, "name"); }}
                                         value={this.state.name} 
                                         />) :
                                     (<span className="font-weight-bold">{this.state.name}</span>)
                                 }
-                                <button className="btn btn-sm btn-dark" onClick={this.addEntry}><i className="fa fa-plus"></i></button>
+                                <button className="btn btn-sm btn-dark ml-1" onClick={this.addEntry}><i className="fa fa-plus"></i></button>
                             </div>
                             <div className="col my-auto">
                                 <span className="mr-1"><i className="fa fa-square text-primary"></i></span>
@@ -264,7 +263,7 @@ class Group extends Component {
                                     (<input 
                                         type="number" 
                                         className="form-control form-control-sm" 
-                                        style={{ width: '30%', display:"inline-block"}} 
+                                        style={{ width: '30%', display: "inline-block"}} 
                                         value={this.state.splitQuantity} 
                                         onChange={(e) => { this.onChangeGroupAttr(e, "splitQuantity"); }} />) :
                                     (<span>{floor(this.state.splitQuantity)}</span>)
